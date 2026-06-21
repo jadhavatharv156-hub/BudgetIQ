@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>BudgetIQ - Register</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+
+    background:
+    linear-gradient(rgba(0,0,0,0.4),
+    rgba(0,0,0,0.4)),
+    url('https://images.unsplash.com/photo-1554224155-6726b3ff858f');
+
+    background-size:cover;
+    background-position:center;
+}
+
+
+/* Glassmorphism Login Card */
+.box{
+    width:400px;
+    padding:40px;
+
+    background:rgba(255,255,255,0.15);
+
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+
+    border:1px solid rgba(255,255,255,0.2);
+
+    border-radius:20px;
+
+    box-shadow:
+    0 8px 32px rgba(0,0,0,0.35);
+
+    text-align:center;
+
+    animation:slideUp 0.8s ease;
+}
+
+h2{
+    color:#2E7D32;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    color:#666;
+    margin-bottom:20px;
+    font-size:14px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:14px;
+}
+
+input:focus{
+    outline:none;
+    border-color:#4CAF50;
+    box-shadow:0 0 8px rgba(76,175,80,0.3);
+}
+
+.password-container{
+    position:relative;
+}
+
+.password-container span{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    font-size:18px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+
+    background:#4CAF50;
+    color:white;
+
+    border:none;
+    border-radius:8px;
+
+    font-size:16px;
+    font-weight:bold;
+
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#388E3C;
+}
+
+a{
+    text-decoration:none;
+    color:#4CAF50;
+    font-weight:bold;
+}
+
+a:hover{
+    text-decoration:underline;
+}
+
+.footer{
+    margin-top:15px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="box">
+
+```
+<h2>💰 BudgetIQ</h2>
+<p class="subtitle">Manage Your Expenses Smartly</p>
+
+<form method="POST" action="/register">
+
+    <input type="text"
+           name="username"
+           placeholder="Enter Username"
+           required>
+
+    <input type="email"
+           name="email"
+           placeholder="Enter Email"
+           required>
+
+    <div class="password-container">
+        <input type="password"
+               id="password"
+               name="password"
+               placeholder="Enter Password"
+               minlength="6"
+               required>
+
+        <span onclick="togglePassword()">👁️</span>
+
+        <p style="font-size:12px;color:#666;margin-top:5px;">
+            Password must contain at least 6 characters.
+        </p>
+    </div>
+
+
+{% if message %}
+<p class="error-message">{{ message }}</p>
+{% endif %}
+
+    <button type="submit">
+        Register
+    </button>
+
+</form>
+
+<div class="footer">
+    <a href="/login">Already have an account?</a>
+</div>
+```
+
+</div>
+
+<script>
+function togglePassword(){
+
+    let password =
+        document.getElementById("password");
+
+    if(password.type === "password"){
+        password.type = "text";
+    }
+    else{
+        password.type = "password";
+    }
+}
+</script>
+
+</body>
+</html>

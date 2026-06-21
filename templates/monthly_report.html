@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Monthly Report — BudgetIQ</title>
+
+    <!-- =============================================
+         CHART.JS — For rendering the bar chart
+         ============================================= -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        /* =============================================
+           RESET & BASE
+           ============================================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* =============================================
+           BODY — Dark finance-themed background
+           ============================================= */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0f1b2d;
+            min-height: 100vh;
+            padding: 30px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* --- Floating currency symbols background --- */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(39,174,96,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 80%, rgba(52,152,219,0.08) 0%, transparent 55%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '₹  $  €  ₹  %  $  ↑  ₹  €  $  ↓  ₹  $  %  €  ₹  $  ↑  ₹  €';
+            position: fixed;
+            top: 0; left: 0;
+            width: 200%;
+            font-size: 18px;
+            font-family: monospace;
+            font-weight: 700;
+            color: rgba(79,195,247,0.045);
+            word-spacing: 2.2rem;
+            line-height: 3.8rem;
+            letter-spacing: 1.5rem;
+            pointer-events: none;
+            z-index: 0;
+            white-space: pre-wrap;
+            animation: bgScrollSyms 60s linear infinite;
+        }
+
+        @keyframes bgScrollSyms {
+            0%   { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
+        }
+
+        /* =============================================
+           MAIN CONTAINER CARD
+           ============================================= */
+        .container {
+            background: rgba(255,255,255,0.04);
+            padding: 28px;
+            border-radius: 18px;
+            border: 0.5px solid rgba(79,195,247,0.18);
+            max-width: 860px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        /* =============================================
+           HEADINGS
+           ============================================= */
+        h2 {
+            color: #e3f2fd;
+            font-size: 22px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2::before {
+            content: '📅';
+            font-size: 22px;
+        }
+
+        h2 .year-tag {
+            font-size: 14px;
+            font-weight: 400;
+            color: #90caf9;
+            background: rgba(52,152,219,0.15);
+            border: 0.5px solid rgba(52,152,219,0.35);
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        /* =============================================
+           CHART CONTAINER
+           ============================================= */
+        .chart-container {
+            background: rgba(255,255,255,0.03);
+            border: 0.5px solid rgba(79,195,247,0.15);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 20px 0 28px;
+            width: 100%;
+            height: 340px;
+            position: relative;
+        }
+
+        /* =============================================
+           EXPENSE TABLE
+           ============================================= */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        thead tr {
+            background: rgba(79,195,247,0.09);
+        }
+
+        th {
+            padding: 11px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #90caf9;
+            text-align: center;
+            border-bottom: 0.5px solid rgba(79,195,247,0.22);
+        }
+
+        td {
+            padding: 12px 14px;
+            font-size: 13px;
+            color: #cfe8ff;
+            text-align: center;
+            border-bottom: 0.5px solid rgba(255,255,255,0.05);
+            transition: background 0.15s;
+        }
+
+        /* Month name column */
+        td:first-child {
+            color: #90caf9;
+            font-weight: 600;
+        }
+
+        /* Amount column — green monospace */
+        td:last-child {
+            color: #7ef9ac;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: rgba(79,195,247,0.06);
+        }
+
+        /* =============================================
+           BACK BUTTON
+           ============================================= */
+        .back-btn {
+            background: #2980b9;
+            color: #ffffff;
+            padding: 9px 18px;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(41,128,185,0.3);
+            transition: filter 0.15s, transform 0.12s;
+        }
+
+        .back-btn:hover {
+            filter: brightness(1.12);
+            transform: translateY(-1px);
+        }
+
+        .back-btn:active {
+            transform: scale(0.97);
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- ── NAVIGATION ─────────────────────────── -->
+        <a href="/dashboard">
+            <button class="back-btn">⬅ Back to Dashboard</button>
+        </a>
+
+        <!-- ── PAGE HEADING ───────────────────────── -->
+        <h2>
+            Monthly Report
+            <span class="year-tag">{{ year }}</span>
+        </h2>
+
+        <!-- ── BAR CHART ──────────────────────────── -->
+        <div class="chart-container">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+
+        <!-- ── DATA TABLE ─────────────────────────── -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Total Expense</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+
+    <!-- =============================================
+         CHART.JS CONFIGURATION
+         Reads month labels and totals passed from Flask
+         ============================================= -->
+    <script>
+
+        // --- Grab the canvas context ---
+        const ctx = document.getElementById('monthlyChart').getContext('2d');
+
+        // --- Month labels and expense totals from Flask ---
+        const monthLabels = {{ months | tojson }};
+        const expenseTotals = {{ totals | tojson }};
+
+        // --- Colour palette for each bar (cycles if > 12 months) ---
+        const barColors = [
+            '#3498db', '#9b59b6', '#27ae60', '#e67e22',
+            '#e74c3c', '#1abc9c', '#f39c12', '#2980b9',
+            '#8e44ad', '#16a085', '#d35400', '#c0392b'
+        ];
+
+        // --- Build the Chart.js bar chart ---
+        new Chart(ctx, {
+
+            type: 'bar',
+
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Total Expenses (₹)',
+                    data: expenseTotals,
+
+                    /* Each bar gets its own colour from the palette */
+                    backgroundColor: monthLabels.map(
+                        (_, i) => barColors[i % barColors.length] + 'CC'  /* CC = 80% opacity */
+                    ),
+                    borderColor: monthLabels.map(
+                        (_, i) => barColors[i % barColors.length]
+                    ),
+                    borderWidth: 1.5,
+                    borderRadius: 6,           /* Rounded bar tops */
+                    borderSkipped: false
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#90caf9',
+                            font: { size: 12, weight: '600' }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15,27,45,0.95)',
+                        borderColor: 'rgba(79,195,247,0.3)',
+                        borderWidth: 1,
+                        titleColor: '#90caf9',
+                        bodyColor: '#7ef9ac',
+                        callbacks: {
+                            /* Add ₹ symbol inside tooltip */
+                            label: function(context) {
+                                return '  ₹' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        ticks: { color: '#90caf9', font: { size: 12 } },
+                        grid:  { color: 'rgba(79,195,247,0.07)' }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#90caf9',
+                            font: { size: 12 },
+                            /* Add ₹ prefix to Y-axis labels */
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString();
+                            }
+                        },
+                        grid: { color: 'rgba(79,195,247,0.07)' }
+                    }
+                }
+            }
+        });
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>BudgetIQ - Login</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:
+    linear-gradient(
+        rgba(0,0,0,0.55),
+        rgba(0,0,0,0.55)
+    ),
+    url('https://images.unsplash.com/photo-1579621970795-87facc2f976d');
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+}
+
+/* Glassmorphism Login Card */
+.box{
+    width:400px;
+    padding:40px;
+
+    background:rgba(255,255,255,0.15);
+
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+
+    border:1px solid rgba(255,255,255,0.2);
+
+    border-radius:20px;
+
+    box-shadow:
+    0 8px 32px rgba(0,0,0,0.35);
+
+    text-align:center;
+
+    animation:slideUp 0.8s ease;
+}
+
+/* Logo */
+h2{
+    color:white;
+    font-size:34px;
+    margin-bottom:8px;
+}
+
+.subtitle{
+    color:#e8e8e8;
+    margin-bottom:25px;
+    font-size:14px;
+}
+
+/* Inputs */
+input{
+    width:100%;
+    padding:14px;
+    margin:10px 0;
+
+    border:none;
+    border-radius:10px;
+
+    background:rgba(255,255,255,0.92);
+
+    font-size:15px;
+}
+
+input:focus{
+    outline:none;
+
+    box-shadow:
+    0 0 15px rgba(76,175,80,0.6);
+
+    transform:scale(1.02);
+
+    transition:0.3s;
+}
+
+/* Password Toggle */
+.password-container{
+    position:relative;
+}
+
+.password-container span{
+    position:absolute;
+    right:15px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    font-size:18px;
+}
+
+/* Button */
+button{
+    width:100%;
+    padding:14px;
+    margin-top:15px;
+
+    border:none;
+    border-radius:10px;
+
+    background:#4CAF50;
+    color:white;
+
+    font-size:16px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:all 0.3s ease;
+}
+
+button:hover{
+    background:#388E3C;
+
+    transform:translateY(-3px);
+
+    box-shadow:
+    0 8px 20px rgba(76,175,80,0.45);
+}
+
+/* Link */
+a{
+    color:white;
+    text-decoration:none;
+    font-weight:600;
+}
+
+a:hover{
+    text-decoration:underline;
+}
+
+.footer{
+    margin-top:18px;
+}
+
+/* Animation */
+@keyframes slideUp{
+    from{
+        opacity:0;
+        transform:translateY(40px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+</style>
+
+</head>
+<body>
+
+<div class="box">
+
+```
+<h2>💰 BudgetIQ</h2>
+
+<p class="subtitle">
+    Track Expenses • Save Money • Build Wealth
+</p>
+
+<form method="POST">
+
+    <input
+        type="text"
+        name="username"
+        placeholder="Enter Email"
+        required>
+
+    <div class="password-container">
+
+        <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter Password"
+            required>
+
+        <span onclick="togglePassword()">👁️</span>
+
+    </div>
+
+    <button type="submit">
+        Login
+    </button>
+
+</form>
+
+<div class="footer">
+    <a href="/register">Create Account</a>
+</div>
+```
+
+</div>
+
+<script>
+function togglePassword(){
+
+    let password =
+        document.getElementById("password");
+
+    if(password.type === "password"){
+        password.type = "text";
+    }
+    else{
+        password.type = "password";
+    }
+}
+</script>
+
+</body>
+</html>

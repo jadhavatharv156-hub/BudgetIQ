@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Category Report — BudgetIQ</title>
+
+    <!-- =============================================
+         CHART.JS — Pie / Doughnut chart library
+         ============================================= -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        /* =============================================
+           RESET & BASE
+           ============================================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* =============================================
+           BODY — Dark finance-themed background
+           ============================================= */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0f1b2d;
+            min-height: 100vh;
+            padding: 30px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* --- Radial glow accents --- */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(155,89,182,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 80%, rgba(52,152,219,0.08) 0%, transparent 55%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- Floating currency symbols --- */
+        body::after {
+            content: '₹  $  €  ₹  %  $  ↑  ₹  €  $  ↓  ₹  $  %  €  ₹  $  ↑  ₹  €';
+            position: fixed;
+            top: 0; left: 0;
+            width: 200%;
+            font-size: 18px;
+            font-family: monospace;
+            font-weight: 700;
+            color: rgba(79,195,247,0.045);
+            word-spacing: 2.2rem;
+            line-height: 3.8rem;
+            letter-spacing: 1.5rem;
+            pointer-events: none;
+            z-index: 0;
+            white-space: pre-wrap;
+            animation: bgScrollSyms 60s linear infinite;
+        }
+
+        @keyframes bgScrollSyms {
+            0%   { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
+        }
+
+        /* =============================================
+           MAIN CONTAINER CARD
+           ============================================= */
+        .container {
+            background: rgba(255,255,255,0.04);
+            padding: 28px;
+            border-radius: 18px;
+            border: 0.5px solid rgba(79,195,247,0.18);
+            max-width: 860px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        /* =============================================
+           HEADINGS
+           ============================================= */
+        h2 {
+            color: #e3f2fd;
+            font-size: 22px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2::before {
+            content: '🏷️';
+            font-size: 22px;
+        }
+
+        h2 .year-tag {
+            font-size: 14px;
+            font-weight: 400;
+            color: #90caf9;
+            background: rgba(155,89,182,0.15);
+            border: 0.5px solid rgba(155,89,182,0.35);
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        /* =============================================
+           CHART + LEGEND LAYOUT
+           Side-by-side: pie on left, legend on right
+           ============================================= */
+        .chart-layout {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 20px 0 28px;
+        }
+
+        /* --- Pie chart wrapper --- */
+        .chart-container {
+            background: rgba(255,255,255,0.03);
+            border: 0.5px solid rgba(79,195,247,0.15);
+            border-radius: 14px;
+            padding: 20px;
+            flex: 0 0 300px;
+            height: 300px;
+            position: relative;
+        }
+
+        /* --- Custom legend beside the chart --- */
+        .chart-legend {
+            flex: 1;
+            min-width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .legend-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #90caf9;
+            margin-bottom: 4px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.03);
+            border: 0.5px solid rgba(79,195,247,0.1);
+            border-radius: 8px;
+            transition: background 0.15s;
+        }
+
+        .legend-item:hover {
+            background: rgba(79,195,247,0.07);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .legend-name {
+            font-size: 13px;
+            color: #cfe8ff;
+            flex: 1;
+        }
+
+        .legend-pct {
+            font-size: 12px;
+            color: #7ef9ac;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* =============================================
+           EXPENSE TABLE
+           ============================================= */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        thead tr {
+            background: rgba(79,195,247,0.09);
+        }
+
+        th {
+            padding: 11px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #90caf9;
+            text-align: center;
+            border-bottom: 0.5px solid rgba(79,195,247,0.22);
+        }
+
+        td {
+            padding: 12px 14px;
+            font-size: 13px;
+            color: #cfe8ff;
+            text-align: center;
+            border-bottom: 0.5px solid rgba(255,255,255,0.05);
+            transition: background 0.15s;
+        }
+
+        /* Category name column */
+        td:first-child {
+            color: #90caf9;
+            font-weight: 600;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Colour dot inside category cell */
+        .cat-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        /* Amount column — green monospace */
+        td:last-child {
+            color: #7ef9ac;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: rgba(79,195,247,0.06);
+        }
+
+        /* =============================================
+           BACK BUTTON
+           ============================================= */
+        .back-btn {
+            background: #2980b9;
+            color: #ffffff;
+            padding: 9px 18px;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(41,128,185,0.3);
+            transition: filter 0.15s, transform 0.12s;
+        }
+
+        .back-btn:hover {
+            filter: brightness(1.12);
+            transform: translateY(-1px);
+        }
+
+        .back-btn:active {
+            transform: scale(0.97);
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- ── NAVIGATION ─────────────────────────── -->
+        <a href="/dashboard">
+            <button class="back-btn">⬅ Back to Dashboard</button>
+        </a>
+
+        <!-- ── PAGE HEADING ───────────────────────── -->
+        <h2>
+            Category Report
+            <span class="year-tag">{{ year }}</span>
+        </h2>
+
+        <!-- ── PIE CHART + LEGEND LAYOUT ─────────── -->
+        <div class="chart-layout">
+
+            <!-- Pie chart canvas -->
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+
+            <!-- Dynamic legend built by JS below -->
+            <div class="chart-legend">
+                <div class="legend-title">Breakdown</div>
+                <div id="legendItems"></div>
+            </div>
+
+        </div>
+
+        <!-- ── DATA TABLE ─────────────────────────── -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Total Expense</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+
+    <!-- =============================================
+         CHART.JS CONFIGURATION
+         Reads category labels and totals from Flask
+         ============================================= -->
+    <script>
+
+        // --- Canvas context ---
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+
+        // --- Data passed from Flask via Jinja2 ---
+        const categoryLabels = {{ categories | tojson }};
+        const categoryTotals = {{ totals | tojson }}.map(Number);
+
+        // --- Colour palette — one colour per category ---
+        const sliceColors = [
+            '#3498db', '#27ae60', '#9b59b6', '#e67e22',
+            '#1abc9c', '#e74c3c', '#f39c12', '#2980b9',
+            '#8e44ad', '#16a085', '#d35400', '#c0392b'
+        ];
+
+        // --- Total for percentage calculation ---
+        const grandTotal = categoryTotals.reduce(
+            (sum, val) => sum + val,
+            0
+            );
+
+        // --- Build the Chart.js doughnut chart ---
+        new Chart(ctx, {
+
+            type: 'doughnut',      /* Doughnut looks cleaner than plain pie */
+
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryTotals,
+                    backgroundColor: sliceColors.map(c => c + 'CC'),  /* CC = 80% opacity */
+                    borderColor: sliceColors,
+                    borderWidth: 2,
+                    hoverOffset: 10
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '55%',        /* Controls the doughnut hole size */
+
+                plugins: {
+
+                    /* Hide default legend — we built a custom one below */
+                    legend: { display: false },
+
+                    tooltip: {
+                        backgroundColor: 'rgba(15,27,45,0.95)',
+                        borderColor: 'rgba(79,195,247,0.3)',
+                        borderWidth: 1,
+                        titleColor: '#90caf9',
+                        bodyColor: '#7ef9ac',
+                        callbacks: {
+                            /* Show ₹ amount + percentage in tooltip */
+                            label: function(context) {
+                                const val = context.parsed;
+                                const pct = ((val / grandTotal) * 100).toFixed(1);
+                                return `  ₹${val.toLocaleString()}  (${pct}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // -----------------------------------------------
+        // BUILD CUSTOM LEGEND
+        // Loops over categories, injects coloured dots
+        // with name + percentage into #legendItems div
+        // -----------------------------------------------
+        const legendContainer = document.getElementById('legendItems');
+
+        categoryLabels.forEach(function(label, index) {
+            const pct = ((categoryTotals[index] / grandTotal) * 100).toFixed(1);
+            const color = sliceColors[index % sliceColors.length];
+
+            legendContainer.innerHTML += `
+                <div class="legend-item">
+                    <span class="legend-dot" style="background:${color};"></span>
+                    <span class="legend-name">${label}</span>
+                    <span class="legend-pct">${pct}%</span>
+                </div>
+            `;
+        });
+
+    </script>
+
+</body>
+</html>
