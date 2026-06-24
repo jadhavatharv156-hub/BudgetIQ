@@ -53,10 +53,10 @@ The project aims to make personal budgeting easier and more organized.
 | ---------- | ------------------- |
 | Python     | Backend programming |
 | Flask      | Web framework       |
-| SQLite     | Database            |
+| MySQL      | Database            |
 | HTML       | Page structure      |
 | CSS        | Styling             |
-| Bootstrap  | Responsive design   |
+| Java Script| Responsive design   |
 
 ---
 
