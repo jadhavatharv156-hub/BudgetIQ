@@ -156,10 +156,12 @@ Example:
 ## 👨‍💻 Developer
 
 **Atharv Jadhav**
-
+* SQL Developer
+* Data Analytics
+* Database engineer
 * Python Developer
 * Flask Developer
-* Web Application Developer
+  
 
 GitHub:
 https://github.com/jadhavatharv156-hub
