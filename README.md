@@ -57,7 +57,6 @@ The project aims to make personal budgeting easier and more organized.
 | HTML       | Page structure      |
 | CSS        | Styling             |
 | Bootstrap  | Responsive design   |
-| Jinja2     | Template rendering  |
 
 ---
 
